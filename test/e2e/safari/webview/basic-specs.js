@@ -1,12 +1,53 @@
 /* globals expect */
+import B from 'bluebird';
 import desired from './desired';
 import setup from '../../setup-base';
 import { loadWebView, spinTitle, spinWait } from '../../helpers/webview';
 
 
-describe('safari - webview - basics', function() {
+describe('safari - webview - basics', function () {
   const driver = setup(this, desired, {noReset: true}).driver;
   beforeEach(async () => await loadWebView(desired, driver));
+
+  describe('context', function () {
+    it('getting current context should work initially', async () => {
+      await B.delay(500);
+      (await driver.getCurrentContext()).should.be.ok;
+    });
+  });
+
+  describe('implicitWait', function () {
+    it('should set the implicit wait for finding web elements', async () => {
+      await driver.implicitWait(7 * 1000);
+
+      let before = new Date().getTime() / 1000;
+      let hasThrown = false;
+
+      /**
+       * we have to use try catch to actually halt the process here
+       */
+      try {
+        await driver.findElement('tag name', 'notgonnabethere');
+      } catch (e) {
+        hasThrown = true;
+      } finally {
+        hasThrown.should.be.ok;
+      }
+
+      let after = new Date().getTime() / 1000;
+      ((after - before) > 7).should.be.ok;
+      await driver.implicitWait(0);
+    });
+  });
+
+  describe('title', function () {
+    it('should return a valid title on web view', async () => {
+      (await driver.title()).should.include("I am a page title");
+
+      await driver.setContext('NATIVE_APP');
+      expect(async () => await driver.title()).to.throw;
+    });
+  });
 
   it('should find a web element in the web view', async () => {
     (await driver.findElement('id', 'i_am_an_id')).should.exist;

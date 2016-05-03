@@ -1,3 +1,4 @@
+/* globals expect */
 import setup from "../setup-base";
 import env from '../helpers/env';
 import B from 'bluebird';
@@ -32,5 +33,14 @@ describe.skip('touch', function() {
     // destination. Hence allow some deviation here.
     l2.x.should.be.within(l1.x + dx - 2, l1.x + dx + 2);
     l2.y.should.be.within(l1.y + dy - 2, l1.y + dy + 2);
+  });
+
+  it('should not be able to do native touch actions', async () => {
+    let el = await driver.findElement('id', 'flickElem');
+    let gestures = [
+      {action: 'press', options: {element: el}},
+      {action: 'release'}
+    ];
+    expect(async () => await driver.performTouch(gestures)).to.throw;
   });
 });
