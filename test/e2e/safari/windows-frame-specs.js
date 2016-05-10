@@ -62,6 +62,6 @@ describe(`safari - windows and frames (${env.DEVICE}) - without safariAllowPopup
 
   it("should not be able to open js popup windows with safariAllowPopups set to false", async () => {
     await driver.execute("window.open('/test/guinea-pig2.html', null)");
-    expect(async () => await spinTitle("I am another page title", driver, 5)).to.throw;
+    expect(async () => await spinTitle("I am another page title", driver, 5)).to.throw();
   });
 });
